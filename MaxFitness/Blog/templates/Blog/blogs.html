@@ -15,20 +15,22 @@
     {% include 'navbar.html' %}
     <main class="main-div">
         <div class="blog-list">
-            <div class="card mb-3">
-                <img height="350vw" src="{% static 'Blog/img/blog1.jpg' %}" class="card-img-top" alt="...">
-                <div class="card-body">
-                    <h5 class="card-title">The Blog Title</h5>
-                    <p class="card-text">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quod voluptates,
-                        ipsam necessitatibus dignissimos impedit laudantium repellendus inventore. Delectus fugit
-                        quaerat molestias, vitae dolorem, quos placeat voluptas, doloremque repellat recusandae
-                        consequuntur?...</p>
-                    <p class="card-text"><small class="text-muted">
-                            Friday, Jan 12 2010
-                        </small></p>
+            {% for item in blog_list %}
+                <div class="card mb-3">
+                    <img height="350vw" src="{% static 'Blog/img/blog1.jpg' %}" class="card-img-top" alt="...">
+                        <div class="card-body">
+                            <h5 class="card-title">{{item.title}}</h5>
+                            <p class="card-text">{{item.introduction|slice:":300"}}</p>
+                            <p class="card-text"><small class="text-muted">
+                                    <!-- Friday, Jan 12 2010 -->
+                                     {{item.post_date|date:"l ,N d Y g:i A"}}
+                                </small>
+                            <p><span class=" p-2 bg-info rounded">{{item.category}}</span></p>
+                            </p>
+                        </div>
+                    <a href="" class="btn btn-primary m-2">Read More</a>
                 </div>
-                <a href="" class="btn btn-primary m-2">Read More</a>
-            </div>
+            {% endfor %}
         </div>
         <div class="filter-list">
             <h2>Filters</h2>

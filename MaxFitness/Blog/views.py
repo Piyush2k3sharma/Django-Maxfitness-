@@ -1,16 +1,18 @@
 from django.shortcuts import render,HttpResponse
 from . import models
+from .models import Blog
+import random
 
 # Create your views here.
 def blog_home(request):
-    return render(request, 'Blog/blogs.html')
+    blog_list = Blog.objects.all()
+    random.randint(1,6)
+    return render(request, 'Blog/blogs.html',{'blog_list' : blog_list})
 
 def add_blog(request):
     if request.POST:
 
-        msg = {
-
-        }
+        msg = {}
 
         title = request.POST.get('title')
         category = request.POST.get('category')
@@ -53,3 +55,6 @@ def add_blog(request):
 
 
     return render(request,'Blog/add_blog.html')
+
+def view_blog(request):
+    return render(request,'Blog/view_blogs.html')
