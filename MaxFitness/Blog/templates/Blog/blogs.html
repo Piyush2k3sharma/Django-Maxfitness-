@@ -28,7 +28,7 @@
                             <p><span class=" p-2 bg-info rounded">{{item.category}}</span></p>
                             </p>
                         </div>
-                    <a href="" class="btn btn-primary m-2">Read More</a>
+                    <a href="{% url 'Blog:view_blogs' blog_id=item.blog_id %}" class="btn btn-primary m-2">Read More</a>
                 </div>
             {% endfor %}
         </div>
