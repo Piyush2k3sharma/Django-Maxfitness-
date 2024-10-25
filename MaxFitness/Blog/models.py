@@ -39,9 +39,11 @@ class Blog(models.Model):
     sub_heading4 = models.CharField(max_length=1000)
     content4 = models.CharField(max_length=10000)
     post_date = models.DateTimeField(auto_now=True)
-    published_by = models.ForeignKey(Bloggers)
+    published_by = models.ForeignKey(Bloggers,on_delete=models.CASCADE,null=True)
     # cascade ,mtbl if user delete ta ohde likhe sare blogs get deleted
 
     def __str__(self):
         return f"Blog id : {self.blog_id} , category : {self.category}"
     
+
+# if database ch kuch changes kite ta migrations bnania paindia taki changes apply hoje 
