@@ -64,7 +64,7 @@ def add_blog(request):
 def view_blog(request,blog_id):
     blog = Blog.objects.get(blog_id=blog_id)
     data = {
-        'blog' : blog
+        'blog_list' : blog
     }
     return render(request,'Blog/view_blogs.html',context=data)
 
@@ -76,7 +76,7 @@ def delete_blog(request,blog_id):
 def update_blog(request,blog_id):
     blog = Blog.objects.get(blog_id=blog_id)
     data = {
-        'blog' : blog
+        'blog_list' : blog
     }
     if request.POST:
 
@@ -113,3 +113,10 @@ def update_blog(request,blog_id):
         else:
             data['error'] = "All fields are required"
     return render(request,'Blog/update_blogs.html',context=data)
+
+
+def login_user(request):
+    return render(request,"Blog/login.html")
+
+def signup_user(request):
+    return render(request,'Blog/signup.html')

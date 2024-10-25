@@ -11,4 +11,6 @@ urlpatterns = [
     path('delete-blog/<int:blog_id>',views.delete_blog,name='delete_blog'),
     path('update-blog/<int:blog_id>',views.update_blog,name='update_blog'),
     path('blog-page/<int:blog_id>/',views.view_blog,name="view_blogs"),
+    path('login/',views.login_user,name="login_user"),
+    path('signup/',views.signup_user,name="signup_user"),
 ]
