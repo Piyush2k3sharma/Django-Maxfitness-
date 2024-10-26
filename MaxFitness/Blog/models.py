@@ -9,8 +9,8 @@ class Bloggers(models.Model):
     email = models.EmailField(unique=True)
     country = models.CharField(max_length=300)
     city = models.CharField(max_length=300)
-    profile_pic = models.ImageField(upload_to="bloggers_profiles",null=True,blank=True)
-    password = models.CharField(max_length=3000)
+    profile_pic = models.ImageField(upload_to="bloggers_profiles",null=True,default='bloggers_profiles/default.jpg')
+    password = models.CharField(max_length=3000, editable=False)
 
     def __str__(self):
         return f"Blogger Id : {self.blogger_id} , First name : {self.first_name} , Last name : {self.last_name}"

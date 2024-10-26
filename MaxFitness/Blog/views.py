@@ -1,12 +1,21 @@
 from django.shortcuts import render,HttpResponse,redirect
 from . import models
 from django.db import IntegrityError
+from django.db.models import Q
 from .models import Blog
 import random
+from django.contrib.auth.hashers import make_password,check_password
 
 # Create your views here.
 def blog_home(request):
-    blog_list = Blog.objects.all()
+    if request.GET:
+        user_query = request.GET.get('user_query')
+        blog_list = models.Blog.objects.filter(Q(title__icontains=user_query) | Q(introduction__icontains=user_query)
+                                       | Q(sub_heading1__icontains=user_query)| Q(sub_heading2__icontains=user_query)| 
+                                       Q(sub_heading3__icontains=user_query)| Q(sub_heading4__icontains=user_query)).all()
+    else:
+        blog_list = Blog.objects.all()
+    
     random.randint(1,6)
     return render(request, 'Blog/blogs.html',{'blog_list' : blog_list})
 
@@ -119,4 +128,41 @@ def login_user(request):
     return render(request,"Blog/login.html")
 
 def signup_user(request):
+    if request.method == 'POST':
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        email = request.POST.get('email')
+        country = request.POST.get('country')
+        city = request.POST.get('city')
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm-password')
+        msg = {}
+        
+        if all([first_name, last_name, email, country, city, password, confirm_password]):
+            if password == confirm_password:
+                try : 
+                    profile_photo = request.FILES.get('profile_photo')
+
+                    encrypted_password = make_password(password)
+
+                    new_blogger = models.Bloggers()
+                    new_blogger.first_name = first_name
+                    new_blogger.last_name = last_name
+                    new_blogger.email = email
+                    new_blogger.country = country
+                    new_blogger.city = city
+                    new_blogger.password = encrypted_password
+                    if profile_photo:
+                        new_blogger.profile_pic = profile_photo
+                    
+                    new_blogger.save()
+                    msg['success'] = 'User Created Successfully.'
+                except IntegrityError as e:
+                    msg['error'] = str(e)
+            else:
+                msg['error'] = 'Passwords Do Not Matched'
+        else:
+            msg['error'] = 'All Fields Are Required'
+        return render(request,'Blog/signup.html',context=msg)
+
     return render(request,'Blog/signup.html')
