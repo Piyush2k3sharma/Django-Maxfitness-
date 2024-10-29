@@ -125,7 +125,29 @@ def update_blog(request,blog_id):
 
 
 def login_user(request):
+    if request.method=='POST':
+        msg = {}
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        if all([email,password]):
+            is_valid_email = models.Bloggers.objects.filter(email=email).exists()
+            if is_valid_email:
+                blogger = models.Bloggers.objects.get(email=email)
+                is_valid_password = check_password(password, blogger.password)
+                if is_valid_password:
+                    request.session['blogger_id'] = blogger.blogger_id
+                    request.session['profile_pic'] = blogger.profile_pic.url
+                    return redirect('homepage')
+                else:
+                    msg['error'] = 'Invalid email or password'
+            else:
+                msg['error'] = 'Invalid email or password'
+        else:
+            msg['error'] = 'All fields are required'
+        return render(request,"Blog/login.html",context=msg)
     return render(request,"Blog/login.html")
+
 
 def signup_user(request):
     if request.method == 'POST':
@@ -166,3 +188,13 @@ def signup_user(request):
         return render(request,'Blog/signup.html',context=msg)
 
     return render(request,'Blog/signup.html')
+
+
+def user_dashboard(request):
+    return render(request,'user_dashboard.html')
+
+def logout_user(request):
+    if request.session.get('blogger_id'):
+        del request.session['blogger_id']
+        del request.session['profile_pic']
+    return redirect('homepage')

@@ -13,4 +13,6 @@ urlpatterns = [
     path('blog-page/<int:blog_id>/',views.view_blog,name="view_blogs"),
     path('login/',views.login_user,name="login_user"),
     path('signup/',views.signup_user,name="signup_user"),
+    path('dashboard/',views.user_dashboard,name="dashboard"),
+    path('logout/',views.logout_user,name="logout_user"),
 ]
