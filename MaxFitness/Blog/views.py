@@ -14,12 +14,18 @@ def blog_home(request):
                                        | Q(sub_heading1__icontains=user_query)| Q(sub_heading2__icontains=user_query)| 
                                        Q(sub_heading3__icontains=user_query)| Q(sub_heading4__icontains=user_query)).all()
     else:
-        blog_list = Blog.objects.all()
+        blog_list = Blog.objects.select_related('published_by').all()
     
-    random.randint(1,6)
-    return render(request, 'Blog/blogs.html',{'blog_list' : blog_list})
+    data = {
+        'blog_list' : blog_list,
+        'random_number' : random.randint(1,6)
+    }
+    return render(request, 'Blog/blogs.html',context=data)
 
 def add_blog(request):
+    if not request.session.get('blogger_id'):
+        return redirect('Blog:login_user')
+    
     if request.POST:
 
         msg = {}
@@ -50,10 +56,12 @@ def add_blog(request):
             # new_blog.content3 = content3
             # new_blog.content4 = content4
             # new_blog.save()
+            blogger_id = request.session.get('blogger_id')
+            blogger = models.Blogger.objects.get(blogger_id=blogger_id)
             models.Blog.objects.create(title=title,category=category,introduction=introduction,
                                        sub_heading1=sub_heading1,sub_heading2=sub_heading2,sub_heading3=sub_heading3,
                                        sub_heading4=sub_heading4,content1=content1,content2=content2,content3=content3,
-                                       content4=content4)
+                                       content4=content4,published_by=blogger)
             
             msg['success'] = "New Blog created Successfully"
 
@@ -78,11 +86,16 @@ def view_blog(request,blog_id):
     return render(request,'Blog/view_blogs.html',context=data)
 
 def delete_blog(request,blog_id):
-    blog = Blog.objects.get(blog_id=blog_id)
-    blog.delete()
+    if not request.session.get('blogger_id'):
+        return redirect('Blog:login_user')
+    # blog = Blog.objects.get(blog_id=blog_id)
+    # blog.delete()
     return redirect('Blog:blogapp')
 
 def update_blog(request,blog_id):
+    if not request.session.get('blogger_id'):
+        return redirect('Blog:login_user')
+    
     blog = Blog.objects.get(blog_id=blog_id)
     data = {
         'blog_list' : blog
@@ -126,7 +139,9 @@ def update_blog(request,blog_id):
 
 def login_user(request):
     if request.method=='POST':
+        
         msg = {}
+        
         email = request.POST.get('email')
         password = request.POST.get('password')
 
@@ -191,7 +206,22 @@ def signup_user(request):
 
 
 def user_dashboard(request):
-    return render(request,'user_dashboard.html')
+    if request.session.get('blogger_id'):
+        blogger_id = request.session.get('blogger_id')
+        blogger = models.Blogger.objects.get(blogger_id=blogger_id)
+        """select count(*) from Blogs where published_by = blogger_id"""
+        number_of_blogs = models.Blog.objects.filter(published_by=blogger_id).count()
+        """select * from blogs inner join bloggers on blogs.published_by = bloggers.blogger_id
+        where blogs.published_by = bloggers.blogger_id"""
+        blogger_blogs = models.Blog.objects.select_related('published_by').filter(published_by=blogger_id).all()
+        data = {
+            'blogger': blogger,
+            'number_of_blogs':number_of_blogs,
+            'blogger_blogs':blogger_blogs
+        }
+        return render(request,'Blog/user_dashboard.html',context=data)
+    else:
+        return redirect('Blog:login_user')
 
 def logout_user(request):
     if request.session.get('blogger_id'):
